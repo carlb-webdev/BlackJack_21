@@ -1,7 +1,7 @@
 
 document.body.style.backgroundColor = 'green';
 
-//Global Values:
+//Global Values________________________________
 
 
 //Key variables:
@@ -26,7 +26,12 @@ let dealerPoints = 0;
 let playerMoney = 10000;
 let playerBet = 0;
 
+/* 
+playermoney = Number(localStorage.getItem('playerMoney'));
+console.log(playerMoney);
+ */
 
+//Event Listeners
 
 document.addEventListener('keydown',async function(event){
 
@@ -67,24 +72,12 @@ document.addEventListener('keydown',async function(event){
                 console.log(key); */
                 break;
         }
-    }  
-    //else if  
+    } 
 })
 
-// GAME __________________________________________________________
-
+// GAME START__________________________________________________________
 
 bettingRound();
-
-
-
-
-
-
-
-
-
-
 
 // functions _____________________________________________________
 
@@ -153,7 +146,6 @@ function readPlayerBet(){
     }
 }
 
-
 //Key functions___________________________________________
 
 function enterFunctions(){
@@ -176,15 +168,8 @@ function enterFunctions(){
     }
 }
 
+//Log Functions_________________________
 
-/* 
-showMessage1SecIns1("", bla); // calls func1
-showMessage1SecIns1("", bla, foo); // calls func1, calls func2
-showMessage1SecIns1("", undefined, foo); // calls func2
-
- */
-
-//_________________________________________________________
 function showMessage1SecIns1(string){
     keysEnabled = false;
     let currentMessage = document.getElementById('instructions1').innerText;
@@ -195,8 +180,15 @@ function showMessage1SecIns1(string){
     keysEnabled = true;
 }
 
+function instructions1 (string){
+    document.getElementById('instructions1').innerText = string;
+}
 
+function instructions2 (string){
+    document.getElementById('instructions2').innerText = string;
+}
 
+// Game Dynamics Functions_____________________________
 
 function roundStart(){
     keysEnabled = false;
@@ -213,139 +205,30 @@ function roundStart(){
     keysEnabled = true;
 }
 
+function changeTurn(){
+
+    if (turn === 'player'){
+        turn = 'dealer';
+    }
+    else{
+        turn = 'player';
+    }
+}
 
 function drawOrStay(){
     drawable = true;
     instructions1 ('Do you want to draw another card or do you want to stay?')
     instructions2 ('Press D key to draw or S key to stay')
-
 };
 
 function draw(){
     createCard();
-//    showCard();
 }
 
 function stay(){
     changeTurn();
     createCard();
     dealerPlays();
-//    showCard();
-}
-
-function instructions1 (string){
-    document.getElementById('instructions1').innerText = string;
-}
-
-function instructions2 (string){
-    document.getElementById('instructions2').innerText = string;
-}
-
-
-function createCard(){
-    
-    let newCard = document.createElement('img');
-    newCard.dataset.number = randNumber();
-    newCard.dataset.letter = cardLetter(newCard.dataset.number);
-    newCard.dataset.value = cardValue(newCard.dataset.number);
-    newCard.className = turn;
-
-    newCard.dataset.Type = randType();
-
-    newCard.dataset.code = `${newCard.dataset.letter}${newCard.dataset.Type}`;
-    newCard.style.width = '100px'
-    newCard.style.height = '170px'
-    newCard.src = `cards/${newCard.dataset.code}.png`;
-    let currentDiv = document.getElementById(`${turn}Cards`);
-    currentDiv.appendChild(newCard);
-
-    cardsArray[turn].push(newCard.dataset.value);
-
-
-    turn == 'player'? playerPoints = valueArr(cardsArray[turn]) : dealerPoints = valueArr(cardsArray[turn])
-
-    showPoints();
-
-    console.log(`${newCard.dataset.code} has been created for ${turn}`);
-
-    console.log(cardsArray[turn]);
-}
-
-function showPoints(){
-    document.getElementById('playerPoints').innerText = playerPoints;
-    document.getElementById('dealerPoints').innerText = dealerPoints;
-}
-
-function valueArr(arr){
-    let checkAs = arr.includes('1');   
-    let value = Number(sumArr(arr));
-
-    if (checkAs == true && value < 12){
-        value +=10;
-    }
-    return value;
-}
-
-function sumArr(arr){
-    return arr.reduce(function(a,b){
-      return Number(a) + Number(b)
-    }, 0);
-  } 
-
-  async function checkBust(value){
-
-    if (value < 21){
-        drawOrStay();
-    }
-    else if (value == 21){
-        drawable = 'false';
-        instructions1 ('You got Black Jack!');
-        await waitPromise(1500);
-        changeTurn();
-        dealerPlays();
-    }
-    else if (value > 21){
-        drawable = 'false';
-        instructions1('Bad luck! You got Busted!')
-        await waitPromise(2000);
-        playerLoses();
-    }                   
-}
-
-
-function playerLoses(){
-    drawable = false;
-    instructions1(`You lost ${playerBet}€`);
-    roundEnd();
-}
-function checkBankrupt(){
-    if (playerMoney == 0){
-        keysEnabled = false;
-        instructions1(`You lost ${playerBet}€ and you have lost all your money, please go home`)
-        instructions2('You cannot continue playing, you should think what you are doing with your life')
-    }
-}
-
-function playerWins(){
-    instructions1(`You won ${playerBet}€`);
-    playerMoney += (2*playerBet);
-    roundEnd();
-}
-
-function playerTies(){
-    instructions1(`Player ties, you get back your ${playerBet}€ bet`);
-    playerMoney += playerBet;
-    roundEnd();
-}
-
-function roundEnd(){
-    playerMoneyUpdate();
-    instructions2('Press Enter to start next round');    
-    checkBankrupt();
-    keyEnterEnabled = true
-    keyEnterFunction = 'startRound';
-
-
 }
 
 function dealerPlays(){
@@ -375,8 +258,39 @@ function dealerPlays(){
     }
 }
 
-function bootValues(){
+function playerLoses(){
+    drawable = false;
+    instructions1(`You lost ${playerBet}€`);
+    roundEnd();
+}
 
+function playerWins(){
+    instructions1(`You won ${playerBet}€`);
+    playerMoney += (2*playerBet);
+    roundEnd();
+}
+
+function playerTies(){
+    instructions1(`Player ties, you get back your ${playerBet}€ bet`);
+    playerMoney += playerBet;
+    roundEnd();
+}
+
+function roundEnd(){
+    playerMoneyUpdate();
+/* 
+    localStorage.setItem('playerMoney',playerMoney);
+    console.log(localStorage.getItem('playerMoney'));
+     */
+    instructions2('Press Enter to start next round');    
+    checkBankrupt();
+    keyEnterEnabled = true
+    keyEnterFunction = 'startRound';
+}
+
+// Game Dynamics Secondary Functions_____________________________
+
+function bootValues(){
     keyEnterEnabled = true
     turn = 'player';
     drawable = false;
@@ -390,27 +304,83 @@ function bootValues(){
     document.getElementById('dealerCards').innerHTML = '';    
 }
 
+function createCard(){
+    
+    let newCard = document.createElement('img');
+    newCard.dataset.number = randNumber();
+    newCard.dataset.letter = cardLetter(newCard.dataset.number);
+    newCard.dataset.value = cardValue(newCard.dataset.number);
+    newCard.className = turn;
 
+    newCard.dataset.Type = randType();
 
+    newCard.dataset.code = `${newCard.dataset.letter}${newCard.dataset.Type}`;
+    newCard.style.width = '100px'
+    newCard.style.height = '170px'
+    newCard.src = `cards/${newCard.dataset.code}.png`;
+    let currentDiv = document.getElementById(`${turn}Cards`);
+    currentDiv.appendChild(newCard);
 
+    cardsArray[turn].push(newCard.dataset.value);
 
+    turn == 'player'? playerPoints = valueArr(cardsArray[turn]) : dealerPoints = valueArr(cardsArray[turn])
 
+    showPoints();
+}
 
+function sumArr(arr){
+    return arr.reduce(function(a,b){
+      return Number(a) + Number(b)
+    }, 0);
+  } 
 
-function changeTurn(){
+async function checkBust(value){
 
-    if (turn === 'player'){
-        turn = 'dealer';
+    if (value < 21){
+        drawOrStay();
     }
-    else{
-        turn = 'player';
+    else if (value == 21){
+        drawable = 'false';
+        instructions1 ('You got Black Jack!');
+        await waitPromise(1500);
+        changeTurn();
+        dealerPlays();
+    }
+    else if (value > 21){
+        drawable = 'false';
+        instructions1('Bad luck! You got Busted!')
+        await waitPromise(2000);
+        playerLoses();
+    }                   
+}
+
+function checkBankrupt(){
+    if (playerMoney == 0){
+        keysEnabled = false;
+        instructions1(`You lost ${playerBet}€ and you have lost all your money, please go home`)
+        instructions2('You cannot continue playing, you should think what you are doing')
     }
 }
 
-function randNumber(){
+function showPoints(){
+    document.getElementById('playerPoints').innerText = playerPoints;
+    document.getElementById('dealerPoints').innerText = dealerPoints;
+}
 
+function valueArr(arr){
+    let checkAs = arr.includes('1');   
+    let value = Number(sumArr(arr));
+
+    if (checkAs == true && value < 12){
+        value +=10;
+    }
+    return value;
+}
+
+//Create Random Card Functions_________________________________
+
+function randNumber(){
     return Math.floor((Math.random()*13)+1)
-//    return 1;   //for testing
 }
 
 function cardValue(number){
@@ -449,11 +419,9 @@ function randType(){
             return 'c'
         case 3:
             return 'h'                
-        default:
-            break;
+
     }
 }
-
 
 function waitPromise(milis) {
     return new Promise((resolve, reject) => {
@@ -462,14 +430,3 @@ function waitPromise(milis) {
         }, milis);
     });
 }
-
-/*
-foo();
-const promise1 = waitPromise(1000);
-await promise1;
-bar();
-bar2();
-await waitPromise(500);
-foo3();
-
-*/
